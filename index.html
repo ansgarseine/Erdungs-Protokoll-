@@ -7,7 +7,6 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#2563eb">
 <link rel="icon" href="icon-192.png">
-<!-- jsPDF Einbindung via CDN für vollständige Funktionalität -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
   :root {
@@ -18,7 +17,7 @@
     --text-color: #1e293b;
     --border-color: #cbd5e1;
     --danger: #ef4444;
-    --success: #22c55e;
+    --btn-dark: #2c3e50;
   }
   body {
     font-family: system-ui, -apple-system, sans-serif, Arial;
@@ -87,6 +86,26 @@
     width: 20px;
     height: 20px;
   }
+  /* Buttons für Anlagen-Fotos wie auf dem Bild */
+  .custom-photo-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    background-color: #2c3e50;
+    color: white;
+    padding: 12px;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 0.95rem;
+    cursor: pointer;
+    margin-top: 8px;
+    text-align: center;
+    box-sizing: border-box;
+  }
+  .custom-photo-btn input[type="file"] {
+    display: none;
+  }
   .btn-group {
     display: flex;
     flex-direction: column;
@@ -102,25 +121,10 @@
     font-size: 1rem;
     font-weight: bold;
     cursor: pointer;
-    transition: background 0.2s;
   }
-  button:hover {
-    background-color: var(--primary-dark);
-    opacity: 0.9;
-  }
-  button.btn-secondary {
-    background-color: #64748b;
-  }
-  button.btn-danger {
-    background-color: var(--danger);
-  }
-  .photo-section {
-    margin-top: 10px;
-    border: 2px dashed var(--border-color);
-    padding: 10px;
-    border-radius: 6px;
-    text-align: center;
-  }
+  button.btn-secondary { background-color: #64748b; }
+  button.btn-danger { background-color: var(--danger); }
+  
   .photo-preview {
     display: flex;
     flex-wrap: wrap;
@@ -130,8 +134,8 @@
   }
   .photo-thumb {
     position: relative;
-    width: 85px;
-    height: 85px;
+    width: 80px;
+    height: 80px;
     border-radius: 4px;
     overflow: hidden;
     border: 1px solid var(--border-color);
@@ -149,9 +153,9 @@
     color: white;
     border: none;
     border-radius: 50%;
-    width: 22px;
-    height: 22px;
-    font-size: 14px;
+    width: 20px;
+    height: 20px;
+    font-size: 12px;
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -167,12 +171,12 @@
   
   <form id="erdungsForm">
     
-    <!-- 1. Stammdaten -->
+    <!-- 1. Stammdaten (Original) -->
     <fieldset>
       <legend>Stammdaten</legend>
       <div class="form-group">
-        <label for="kunde">Kunde / Objekt (Adresse):</label>
-        <input type="text" id="kunde" required placeholder="z. B. Musterstraße 12, Musterstadt">
+        <label for="kunde">Kunde / Objekt:</label>
+        <input type="text" id="kunde" required placeholder="Name und Adresse">
       </div>
       <div class="form-group">
         <label for="pruefer">Prüfer / Monteur:</label>
@@ -191,11 +195,11 @@
         <label for="ohmWert">Gemessener Erdungswiderstand (&Omega;):</label>
         <input type="number" step="0.01" id="ohmWert" placeholder="z. B. 0.5">
       </div>
-      <div class="photo-section">
-        <label>Foto vom Erder & Messwerte</label>
-        <input type="file" accept="image/*" capture="environment" id="fileErder" onchange="handlePhoto(event, 'previewErder', 'derder')">
-        <div id="previewErder" class="photo-preview"></div>
-      </div>
+      <label class="custom-photo-btn">
+        📷 Fotos: Erder & Messwerte (<span id="count_derder">0</span>)
+        <input type="file" accept="image/*" capture="environment" onchange="handlePhoto(event, 'previewErder', 'derder', 'count_derder')">
+      </label>
+      <div id="previewErder" class="photo-preview"></div>
     </fieldset>
 
     <!-- 3. Potenzialausgleich -->
@@ -204,32 +208,40 @@
       <div class="form-group">
         <label>Was wurde geerdet?</label>
         <div class="checkbox-list">
-          <label class="checkbox-item"><input type="checkbox" name="pa_ziel" value="Hauptpotentialausgleichsschiene"> Hauptpotentialausgleichsschiene (HPA)</label>
-          <label class="checkbox-item"><input type="checkbox" name="pa_ziel" value="Rohrleitungen (Gas/Wasser/Heizung)"> Rohrleitungen (Gas, Wasser, Heizung)</label>
-          <label class="checkbox-item"><input type="checkbox" name="pa_ziel" value="Antennenanlage / Sat"> Antennenanlage / Sat-Mast</label>
-          <label class="checkbox-item"><input type="checkbox" name="pa_ziel" value="Kabelwanne / Metallkonstruktion"> Metallkonstruktion / Kabelwanne</label>
-          <label class="checkbox-item"><input type="checkbox" name="pa_ziel" value="Blitzschutzanlage"> Blitzschutzanlage</label>
+          <label class="checkbox-item"><input type="checkbox" name="pa_ziel" value="Zählerschrank"> Zählerschrank</label>
+          <label class="checkbox-item"><input type="checkbox" name="pa_ziel" value="Hausanschlusskasten"> Hausanschlusskasten</label>
+          <label class="checkbox-item"><input type="checkbox" name="pa_ziel" value="Gas"> Gas</label>
+          <label class="checkbox-item"><input type="checkbox" name="pa_ziel" value="Wasser"> Wasser</label>
+          <label class="checkbox-item"><input type="checkbox" name="pa_ziel" value="Heizung"> Heizung</label>
+          <label class="checkbox-item"><input type="checkbox" name="pa_ziel" value="Kabelrinne"> Kabelrinne</label>
         </div>
       </div>
       <div class="form-group" style="margin-top: 10px;">
         <label for="paDetails">Zusätzliche Details:</label>
         <textarea id="paDetails" rows="2" placeholder="Optionale Anmerkungen..."></textarea>
       </div>
-      <div class="photo-section">
-        <label>Fotos Potenzialausgleich</label>
-        <input type="file" accept="image/*" capture="environment" id="filePA" onchange="handlePhoto(event, 'previewPA', 'dpa')">
-        <div id="previewPA" class="photo-preview"></div>
-      </div>
+      <label class="custom-photo-btn">
+        📷 Fotos: Potenzialausgleich (<span id="count_dpa">0</span>)
+        <input type="file" accept="image/*" capture="environment" onchange="handlePhoto(event, 'previewPA', 'dpa', 'count_dpa')">
+      </label>
+      <div id="previewPA" class="photo-preview"></div>
     </fieldset>
 
-    <!-- 4. Anlagen Fotos -->
+    <!-- 4. Anlagen-Fotos (Pflicht) - Exakt wie auf Ihrem Screenshot -->
     <fieldset>
-      <legend>Anlagen-Fotos</legend>
-      <div class="photo-section">
-        <label>Fotos der Gesamtanlage</label>
-        <input type="file" accept="image/*" capture="environment" id="fileAnlage" onchange="handlePhoto(event, 'previewAnlage', 'danlage')">
-        <div id="previewAnlage" class="photo-preview"></div>
-      </div>
+      <legend>⚡ Anlagen-Fotos (Pflicht)</legend>
+      
+      <label class="custom-photo-btn">
+        📸 Fotos: Zähleranlagen ( <span id="count_dzaehler">0</span> )
+        <input type="file" accept="image/*" capture="environment" onchange="handlePhoto(event, 'previewZaehler', 'dzaehler', 'count_dzaehler')">
+      </label>
+      <div id="previewZaehler" class="photo-preview"></div>
+
+      <label class="custom-photo-btn">
+        📸 Fotos: Hausanschlusskasten (HAK) ( <span id="count_dhak">0</span> )
+        <input type="file" accept="image/*" capture="environment" onchange="handlePhoto(event, 'previewHAK', 'dhak', 'count_dhak')">
+      </label>
+      <div id="previewHAK" class="photo-preview"></div>
     </fieldset>
 
     <!-- Buttons -->
@@ -243,24 +255,24 @@
 </div>
 
 <script>
-  // Automatisches Datum beim Laden setzen
+  // Automatisches Datum
   document.getElementById('datum').valueAsDate = new Date();
 
-  // Speicher für Fotos
+  // Foto-Speicher
   const photosData = {
     derder: [],
     dpa: [],
-    danlage: []
+    dzaehler: [],
+    dhak: []
   };
 
-  // Hilfsfunktion: Sauberen String für Dateinamen erzeugen
   function sanitizeFilename(str) {
     if (!str) return '';
     return str.replace(/[^a-zA-Z0-9äöüÄÖÜß\-_]/g, '_').replace(/_+/g, '_').substring(0, 30);
   }
 
-  // Foto-Verarbeitung inklusive Wasserzeichen-Stempel (Adresse + Datum/Uhrzeit)
-  function handlePhoto(event, previewId, storageKey) {
+  // Kamera-Aufnahme & Wasserzeichen-Einbettung
+  function handlePhoto(event, previewId, storageKey, countId) {
     const files = event.target.files;
     if (!files || files.length === 0) return;
 
@@ -274,32 +286,27 @@
       reader.onload = function(e) {
         const img = new Image();
         img.onload = function() {
-          // Canvas erstellen, um Wasserzeichen ins Bild einzubrennen
           const canvas = document.createElement('canvas');
           canvas.width = img.width;
           canvas.height = img.height;
           const ctx = canvas.getContext('2d');
 
-          // Original-Bild zeichnen
+          // Bild zeichnen
           ctx.drawImage(img, 0, 0);
 
-          // Wasserzeichen-Hintergrund & Schrift stylen
+          // Wasserzeichen einfügen
           const fontSize = Math.max(16, Math.floor(canvas.height / 35));
           ctx.font = `bold ${fontSize}px sans-serif`;
-          
           const textWidth = ctx.measureText(watermarkText).width;
           const padding = 10;
           const rectHeight = fontSize + (padding * 2);
-          
-          // Schwarzer transparenter Balken unten
+
           ctx.fillStyle = 'rgba(0, 0, 0, 0.65)';
           ctx.fillRect(0, canvas.height - rectHeight, textWidth + (padding * 2), rectHeight);
 
-          // Weißer Text
           ctx.fillStyle = '#ffffff';
           ctx.fillText(watermarkText, padding, canvas.height - padding - 2);
 
-          // In Base64 Umwandeln
           const processedDataUrl = canvas.toDataURL('image/jpeg', 0.85);
 
           photosData[storageKey].push({
@@ -307,18 +314,24 @@
             data: processedDataUrl
           });
 
-          renderPreviews(storageKey, previewId);
+          renderPreviews(storageKey, previewId, countId);
         };
         img.src = e.target.result;
       };
       reader.readAsDataURL(file);
     }
-    event.target.value = ''; // Input zurücksetzen
+    event.target.value = '';
   }
 
-  function renderPreviews(storageKey, previewId) {
+  function renderPreviews(storageKey, previewId, countId) {
     const container = document.getElementById(previewId);
     container.innerHTML = '';
+    
+    // Zähler auf dem Button aktualisieren
+    if (countId) {
+      document.getElementById(countId).innerText = photosData[storageKey].length;
+    }
+
     photosData[storageKey].forEach((photo, index) => {
       const thumb = document.createElement('div');
       thumb.className = 'photo-thumb';
@@ -332,7 +345,7 @@
       delBtn.innerHTML = '&times;';
       delBtn.onclick = function() {
         photosData[storageKey].splice(index, 1);
-        renderPreviews(storageKey, previewId);
+        renderPreviews(storageKey, previewId, countId);
       };
       thumb.appendChild(delBtn);
 
@@ -347,7 +360,8 @@
     const categories = [
       { key: 'derder', prefix: 'Erder' },
       { key: 'dpa', prefix: 'Potenzialausgleich' },
-      { key: 'danlage', prefix: 'Anlage' }
+      { key: 'dzaehler', prefix: 'Zaehleranlage' },
+      { key: 'dhak', prefix: 'HAK' }
     ];
 
     let count = 0;
@@ -373,15 +387,18 @@
       document.getElementById('erdungsForm').reset();
       document.getElementById('datum').valueAsDate = new Date();
       Object.keys(photosData).forEach(key => photosData[key] = []);
-      document.getElementById('previewErder').innerHTML = '';
-      document.getElementById('previewPA').innerHTML = '';
-      document.getElementById('previewAnlage').innerHTML = '';
+      ['previewErder', 'previewPA', 'previewZaehler', 'previewHAK'].forEach(id => {
+        document.getElementById(id).innerHTML = '';
+      });
+      ['count_derder', 'count_dpa', 'count_dzaehler', 'count_dhak'].forEach(id => {
+        document.getElementById(id).innerText = '0';
+      });
     }
   }
 
   function generatePDF() {
     if (!window.jspdf) {
-      alert("jsPDF-Bibliothek lädt noch. Bitte kurz warten oder Seite neu laden.");
+      alert("jsPDF-Bibliothek lädt noch. Bitte kurz warten.");
       return;
     }
     const { jsPDF } = window.jspdf;
@@ -438,7 +455,7 @@
     }
     y += 10;
 
-    // Fotos einbetten
+    // Fotos im PDF verarbeiten
     function addPhotosToPdf(title, photos) {
       if (photos.length === 0) return;
       if (y > 230) { doc.addPage(); y = 20; }
@@ -449,20 +466,20 @@
       photos.forEach(photo => {
         if (y > 210) { doc.addPage(); y = 20; }
         try {
-          // Bild mit festem Seitenverhältnis skalieren/einbetten
           doc.addImage(photo.data, 'JPEG', 15, y, 65, 48);
           y += 53;
         } catch (e) {
-          console.error("Fehler beim Einbetten des Fotos:", e);
+          console.error("Fehler beim Einbetten:", e);
         }
       });
     }
 
     addPhotosToPdf("Fotos: Erder & Messwerte", photosData.derder);
     addPhotosToPdf("Fotos: Potenzialausgleich", photosData.dpa);
-    addPhotosToPdf("Fotos: Gesamtanlage", photosData.danlage);
+    addPhotosToPdf("Fotos: Zähleranlagen", photosData.dzaehler);
+    addPhotosToPdf("Fotos: Hausanschlusskasten (HAK)", photosData.dhak);
 
-    // Dynamischer Dateiname mit Adresse + Datum
+    // PDF Dateiname
     const kundeClean = sanitizeFilename(kunde);
     let fileName = "Erdungsprotokoll";
     if (kundeClean) fileName += `_${kundeClean}`;
