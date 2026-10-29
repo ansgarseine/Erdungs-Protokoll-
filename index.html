@@ -336,7 +336,6 @@
 
           const processedDataUrl = canvas.toDataURL('image/jpeg', 0.85);
 
-          // Original-Dimensionen im Foto-Objekt speichern für korrekte PDF-Proportionen
           photosData[storageKey].push({
             name: file.name,
             data: processedDataUrl,
@@ -487,21 +486,21 @@
 
     let y = 15;
 
-    // --- FIRMENKOPF ---
-    doc.setFontSize(14);
+    // --- ORIGINALER FIRMENKOPF (WIE AUF "MAX STRASSE") ---
+    doc.setFontSize(12);
     doc.setFont(undefined, 'bold');
     doc.setTextColor(37, 99, 235);
-    doc.text("ELEKTRO Fachbetrieb", 15, y);
-    
-    doc.setFontSize(10);
-    doc.setFont(undefined, 'normal');
-    doc.setTextColor(100, 100, 100);
-    doc.text("Jordine GBP GmbH", 15, y + 6);
+    doc.text("ELEKTRO", 15, y);
+    doc.text("Fachbetrieb", 15, y + 5);
 
-    y += 14;
-    doc.setFontSize(16);
-    doc.setFont(undefined, 'bold');
+    doc.setFontSize(11);
+    doc.setFont(undefined, 'normal');
     doc.setTextColor(30, 41, 59);
+    doc.text("Jordine GBP GmbH", 15, y + 11);
+
+    y += 18;
+    doc.setFontSize(15);
+    doc.setFont(undefined, 'bold');
     doc.text("Protokoll über Erstellung der Erdungsanlage", 15, y);
 
     y += 4;
@@ -510,7 +509,7 @@
     doc.line(15, y, 195, y);
 
     y += 10;
-    doc.setFontSize(11);
+    doc.setFontSize(10);
 
     // --- STAMMDATEN ---
     doc.setFont(undefined, 'bold');
@@ -520,12 +519,108 @@
 
     doc.setFont(undefined, 'normal');
     doc.setTextColor(30, 41, 59);
-    doc.text(`Datum:`, 15, y); doc.text(`${datum || '-'}`, 60, y); y += 6;
-    doc.text(`Auftragsnummer:`, 15, y); doc.text(`${auftrag || '-'}`, 60, y); y += 6;
-    doc.text(`Monteur:`, 15, y); doc.text(`${monteur || '-'}`, 60, y); y += 6;
-    doc.text(`Adresse / Objekt:`, 15, y); doc.text(`${strasse || '-'}, ${plz} ${stadt}`, 60, y); y += 10;
+    doc.text(`Datum:`, 15, y); doc.text(`${datum || '-'}`, 55, y); y += 6;
+    doc.text(`Auftragsnummer:`, 15, y); doc.text(`${auftrag || '-'}`, 55, y); y += 6;
+    doc.text(`Monteur:`, 15, y); doc.text(`${monteur || '-'}`, 55, y); y += 6;
+    doc.text(`Adresse / Objekt:`, 15, y); doc.text(`${strasse || '-'}, ${plz} ${stadt}`, 55, y); y += 10;
 
     // --- ERDERPRÜFUNG ---
     doc.setFont(undefined, 'bold');
     doc.setTextColor(37, 99, 235);
-    doc.text
+    doc.text("Erder-Prüfung", 15, y);
+    y += 6;
+
+    doc.setFont(undefined, 'normal');
+    doc.setTextColor(30, 41, 59);
+    doc.text(`Erdungswiderstand:`, 15, y); doc.text(`${ohmWert ? ohmWert + ' Ohm' : 'N/A'}`, 55, y); y += 10;
+
+    // --- POTENZIALAUSGLEICH ---
+    doc.setFont(undefined, 'bold');
+    doc.setTextColor(37, 99, 235);
+    doc.text("Potentialausgleich erforderlich für", 15, y);
+    y += 6;
+
+    doc.setFont(undefined, 'normal');
+    doc.setTextColor(30, 41, 59);
+    if (selectedPA.length > 0) {
+      selectedPA.forEach(item => {
+        doc.text(`- ${item}`, 20, y);
+        y += 6;
+      });
+    } else {
+      doc.text("- Keine", 20, y);
+      y += 6;
+    }
+    if (paDetails) {
+      doc.text(`Details: ${paDetails}`, 20, y);
+      y += 6;
+    }
+    y += 6;
+
+    // --- FOTOS PROPORTIONAL EINBETTEN ---
+    function addPhotosToPdf(title, photos) {
+      if (photos.length === 0) return;
+      if (y > 210) { doc.addPage(); y = 20; }
+      
+      doc.setFont(undefined, 'bold');
+      doc.setTextColor(37, 99, 235);
+      doc.text(title, 15, y); 
+      y += 8;
+      
+      doc.setFont(undefined, 'normal');
+      photos.forEach(photo => {
+        const maxWidth = 75;
+        const maxHeight = 55;
+        
+        let imgWidth = maxWidth;
+        let imgHeight = (photo.height / photo.width) * imgWidth;
+        
+        if (imgHeight > maxHeight) {
+          imgHeight = maxHeight;
+          imgWidth = (photo.width / photo.height) * imgHeight;
+        }
+
+        if (y + imgHeight > 260) { doc.addPage(); y = 20; }
+        
+        try {
+          doc.addImage(photo.data, 'JPEG', 15, y, imgWidth, imgHeight);
+          y += imgHeight + 8;
+        } catch (e) {
+          console.error("Fehler beim Einbetten:", e);
+        }
+      });
+    }
+
+    addPhotosToPdf("Fotos: Erder & Messwerte", photosData.derder);
+    addPhotosToPdf("Fotos: Potenzialausgleich", photosData.dpa);
+    addPhotosToPdf("Fotos: Zähleranlagen", photosData.dzaehler);
+    addPhotosToPdf("Fotos: Hausanschlusskasten (HAK)", photosData.dhak);
+
+    // --- EXAKTE ORIGINAL-FUSSZEILE AUF ALLEN SEITEN ---
+    const pageCount = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      doc.setFontSize(8);
+      doc.setTextColor(100, 100, 100);
+      doc.setDrawColor(200, 200, 200);
+      doc.line(15, 278, 195, 278);
+      doc.text("Erstellt durch ABA Erdungscheck-System", 15, 283);
+      doc.text("Elektro Fachbetrieb Jordine | GBP | GmbH Fred-Joachim-Schoeps-Straße 3, 68229 Mannheim", 15, 287);
+      doc.text(`Seite ${i} von ${pageCount}`, 195, 287, { align: 'right' });
+    }
+
+    // PDF Dateiname
+    const strasseClean = sanitizeFilename(strasse);
+    const stadtClean = sanitizeFilename(stadt);
+    let fileName = "Erdungsprotokoll";
+    if (strasseClean) fileName += `_${strasseClean}`;
+    if (stadtClean) fileName += `_${stadtClean}`;
+    if (datum) fileName += `_${datum}`;
+    fileName += ".pdf";
+
+    doc.save(fileName);
+  }
+</script>
+
+</body>
+</html>
