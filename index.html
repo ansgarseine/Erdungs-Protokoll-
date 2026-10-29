@@ -117,8 +117,6 @@
     flex-direction: column;
     gap: 10px;
     margin-top: 20px;
-    border-top: 1px dashed var(--border-color);
-    padding-top: 15px;
   }
   button {
     background-color: var(--primary);
@@ -272,7 +270,7 @@
     <!-- 5. Abschluss, Export & Aktion -->
     <fieldset>
       <legend>✅ Abschluss, Export & Aktion</legend>
-      <div class="btn-group" style="border-top: none; margin-top: 0; padding-top: 0;">
+      <div class="btn-group">
         <button type="button" onclick="showSummary()">📋 Zusammenfassung anzeigen</button>
         <button type="button" class="btn-success" onclick="generatePDF()">📄 PDF-Bericht erstellen & herunterladen</button>
         <button type="button" class="btn-secondary" onclick="downloadAllPhotos()">📷 Alle Fotos einzeln herunterladen</button>
@@ -486,7 +484,7 @@
 
     let y = 15;
 
-    // --- ORIGINALER FIRMENKOPF (WIE AUF "MAX STRASSE") ---
+    // --- ORIGINALER FIRMENKOPF IM PDF (WIE BEI "MAX STRASSE") ---
     doc.setFontSize(12);
     doc.setFont(undefined, 'bold');
     doc.setTextColor(37, 99, 235);
