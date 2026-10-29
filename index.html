@@ -17,6 +17,7 @@
     --text-color: #1e293b;
     --border-color: #cbd5e1;
     --danger: #ef4444;
+    --success: #22c55e;
   }
   body {
     font-family: system-ui, -apple-system, sans-serif, Arial;
@@ -116,6 +117,8 @@
     flex-direction: column;
     gap: 10px;
     margin-top: 20px;
+    border-top: 1px dashed var(--border-color);
+    padding-top: 15px;
   }
   button {
     background-color: var(--primary);
@@ -126,7 +129,10 @@
     font-size: 1rem;
     font-weight: bold;
     cursor: pointer;
+    transition: background 0.2s;
   }
+  button:hover { opacity: 0.9; }
+  button.btn-success { background-color: var(--success); }
   button.btn-secondary { background-color: #64748b; }
   button.btn-danger { background-color: var(--danger); }
   
@@ -176,7 +182,7 @@
   
   <form id="erdungsForm">
     
-    <!-- Stammdaten exakt nach Vorgabe -->
+    <!-- 1. Stammdaten -->
     <fieldset>
       <legend>📋 Stammdaten</legend>
       <div class="form-group">
@@ -207,7 +213,7 @@
       </div>
     </fieldset>
 
-    <!-- Erderprüfung -->
+    <!-- 2. Erderprüfung -->
     <fieldset>
       <legend>Erderprüfung</legend>
       <div class="form-group">
@@ -221,7 +227,7 @@
       <div id="previewErder" class="photo-preview"></div>
     </fieldset>
 
-    <!-- Potenzialausgleich -->
+    <!-- 3. Potenzialausgleich -->
     <fieldset>
       <legend>Potenzialausgleich</legend>
       <div class="form-group">
@@ -246,7 +252,7 @@
       <div id="previewPA" class="photo-preview"></div>
     </fieldset>
 
-    <!-- Anlagen-Fotos -->
+    <!-- 4. Anlagen-Fotos -->
     <fieldset>
       <legend>⚡ Anlagen-Fotos (Pflicht)</legend>
       
@@ -263,12 +269,16 @@
       <div id="previewHAK" class="photo-preview"></div>
     </fieldset>
 
-    <!-- Buttons -->
-    <div class="btn-group">
-      <button type="button" onclick="generatePDF()">PDF erstellen & herunterladen</button>
-      <button type="button" class="btn-secondary" onclick="downloadAllPhotos()">Einzelne Fotos herunterladen</button>
-      <button type="button" class="btn-danger" onclick="clearForm()">Formular leeren</button>
-    </div>
+    <!-- 5. Abschluss, Export & Aktion -->
+    <fieldset>
+      <legend>✅ Abschluss, Export & Aktion</legend>
+      <div class="btn-group" style="border-top: none; margin-top: 0; padding-top: 0;">
+        <button type="button" onclick="showSummary()">📋 Zusammenfassung anzeigen</button>
+        <button type="button" class="btn-success" onclick="generatePDF()">📄 PDF-Bericht erstellen & herunterladen</button>
+        <button type="button" class="btn-secondary" onclick="downloadAllPhotos()">📷 Alle Fotos einzeln herunterladen</button>
+        <button type="button" class="btn-danger" onclick="clearForm()">🗑️ Formular vollständig leeren (Reset)</button>
+      </div>
+    </fieldset>
 
   </form>
 </div>
@@ -326,9 +336,12 @@
 
           const processedDataUrl = canvas.toDataURL('image/jpeg', 0.85);
 
+          // Original-Dimensionen im Foto-Objekt speichern für korrekte PDF-Proportionen
           photosData[storageKey].push({
             name: file.name,
-            data: processedDataUrl
+            data: processedDataUrl,
+            width: img.width,
+            height: img.height
           });
 
           renderPreviews(storageKey, previewId, countId);
@@ -367,6 +380,44 @@
 
       container.appendChild(thumb);
     });
+  }
+
+  function showSummary() {
+    const datum = document.getElementById('datum').value;
+    const auftrag = document.getElementById('auftragsnummer').value.trim() || '-';
+    const monteur = document.getElementById('monteur').value.trim() || '-';
+    const strasse = document.getElementById('strasse').value.trim() || '-';
+    const plz = document.getElementById('plz').value.trim() || '';
+    const stadt = document.getElementById('stadt').value.trim() || '';
+    const ohmWert = document.getElementById('ohmWert').value || 'Keine Angabe';
+    const paDetails = document.getElementById('paDetails').value.trim() || 'Keine';
+
+    const selectedPA = Array.from(document.querySelectorAll('input[name="pa_ziel"]:checked'))
+                            .map(cb => cb.value);
+    const paText = selectedPA.length > 0 ? selectedPA.join(', ') : 'Keine Auswahl';
+
+    const totalPhotos = photosData.derder.length + photosData.dpa.length + photosData.dzaehler.length + photosData.dhak.length;
+
+    const summaryText = 
+      `--- PROTOKOLL-ZUSAMMENFASSUNG ---\n\n` +
+      `STAMMDATEN:\n` +
+      `• Datum: ${datum}\n` +
+      `• Auftragsnummer: ${auftrag}\n` +
+      `• Monteur: ${monteur}\n` +
+      `• Adresse: ${strasse}, ${plz} ${stadt}\n\n` +
+      `ERDERPRÜFUNG:\n` +
+      `• Erdungswiderstand: ${ohmWert} Ohm\n\n` +
+      `POTENZIALAUSGLEICH:\n` +
+      `• Geerdet: ${paText}\n` +
+      `• Details: ${paDetails}\n\n` +
+      `FOTOS ANGESAMMELT:\n` +
+      `• Erder & Messwerte: ${photosData.derder.length}\n` +
+      `• Potenzialausgleich: ${photosData.dpa.length}\n` +
+      `• Zähleranlagen: ${photosData.dzaehler.length}\n` +
+      `• Hausanschlusskasten (HAK): ${photosData.dhak.length}\n` +
+      `• Gesamtanzahl Fotos: ${totalPhotos}`;
+
+    alert(summaryText);
   }
 
   function downloadAllPhotos() {
@@ -434,85 +485,47 @@
     const selectedPA = Array.from(document.querySelectorAll('input[name="pa_ziel"]:checked'))
                             .map(cb => cb.value);
 
-    let y = 20;
-    doc.setFontSize(16);
+    let y = 15;
+
+    // --- FIRMENKOPF ---
+    doc.setFontSize(14);
+    doc.setFont(undefined, 'bold');
     doc.setTextColor(37, 99, 235);
-    doc.text("Protokoll über Erstellung der Erdungsanlage", 105, y, { align: 'center' });
+    doc.text("ELEKTRO Fachbetrieb", 15, y);
     
-    y += 15;
-    doc.setFontSize(11);
+    doc.setFontSize(10);
+    doc.setFont(undefined, 'normal');
+    doc.setTextColor(100, 100, 100);
+    doc.text("Jordine GBP GmbH", 15, y + 6);
+
+    y += 14;
+    doc.setFontSize(16);
+    doc.setFont(undefined, 'bold');
     doc.setTextColor(30, 41, 59);
-    
-    // Stammdaten im PDF
-    doc.setFont(undefined, 'bold');
-    doc.text("Stammdaten", 15, y); y += 7;
-    doc.setFont(undefined, 'normal');
-    doc.text(`Datum: ${datum || '-'}`, 15, y); y += 6;
-    doc.text(`Auftragsnummer: ${auftrag || '-'}`, 15, y); y += 6;
-    doc.text(`Monteur: ${monteur || '-'}`, 15, y); y += 6;
-    doc.text(`Straße & Hausnummer: ${strasse || '-'}`, 15, y); y += 6;
-    doc.text(`PLZ / Stadt: ${plz} ${stadt}`, 15, y); y += 12;
+    doc.text("Protokoll über Erstellung der Erdungsanlage", 15, y);
 
-    // Erderprüfung
-    doc.setFont(undefined, 'bold');
-    doc.text("Erderprüfung", 15, y); y += 7;
-    doc.setFont(undefined, 'normal');
-    doc.text(`Gemessener Erdungswiderstand: ${ohmWert ? ohmWert + ' Ohm' : 'Keine Angabe'}`, 15, y); y += 12;
+    y += 4;
+    doc.setDrawColor(37, 99, 235);
+    doc.setLineWidth(0.8);
+    doc.line(15, y, 195, y);
 
-    // Potenzialausgleich
-    doc.setFont(undefined, 'bold');
-    doc.text("Potenzialausgleich (Was wurde geerdet?)", 15, y); y += 7;
-    doc.setFont(undefined, 'normal');
-    if (selectedPA.length > 0) {
-      selectedPA.forEach(item => {
-        doc.text(`- ${item}`, 20, y);
-        y += 6;
-      });
-    } else {
-      doc.text("- Keine Auswahl getroffen", 20, y);
-      y += 6;
-    }
-    if (paDetails) {
-      doc.text(`Details: ${paDetails}`, 20, y);
-      y += 6;
-    }
     y += 10;
+    doc.setFontSize(11);
 
-    function addPhotosToPdf(title, photos) {
-      if (photos.length === 0) return;
-      if (y > 230) { doc.addPage(); y = 20; }
-      doc.setFont(undefined, 'bold');
-      doc.text(title, 15, y); y += 8;
-      doc.setFont(undefined, 'normal');
+    // --- STAMMDATEN ---
+    doc.setFont(undefined, 'bold');
+    doc.setTextColor(37, 99, 235);
+    doc.text("Stammdaten", 15, y);
+    y += 6;
 
-      photos.forEach(photo => {
-        if (y > 210) { doc.addPage(); y = 20; }
-        try {
-          doc.addImage(photo.data, 'JPEG', 15, y, 65, 48);
-          y += 53;
-        } catch (e) {
-          console.error("Fehler beim Einbetten:", e);
-        }
-      });
-    }
+    doc.setFont(undefined, 'normal');
+    doc.setTextColor(30, 41, 59);
+    doc.text(`Datum:`, 15, y); doc.text(`${datum || '-'}`, 60, y); y += 6;
+    doc.text(`Auftragsnummer:`, 15, y); doc.text(`${auftrag || '-'}`, 60, y); y += 6;
+    doc.text(`Monteur:`, 15, y); doc.text(`${monteur || '-'}`, 60, y); y += 6;
+    doc.text(`Adresse / Objekt:`, 15, y); doc.text(`${strasse || '-'}, ${plz} ${stadt}`, 60, y); y += 10;
 
-    addPhotosToPdf("Fotos: Erder & Messwerte", photosData.derder);
-    addPhotosToPdf("Fotos: Potenzialausgleich", photosData.dpa);
-    addPhotosToPdf("Fotos: Zähleranlagen", photosData.dzaehler);
-    addPhotosToPdf("Fotos: Hausanschlusskasten (HAK)", photosData.dhak);
-
-    // PDF Dateiname
-    const strasseClean = sanitizeFilename(strasse);
-    const stadtClean = sanitizeFilename(stadt);
-    let fileName = "Erdungsprotokoll";
-    if (strasseClean) fileName += `_${strasseClean}`;
-    if (stadtClean) fileName += `_${stadtClean}`;
-    if (datum) fileName += `_${datum}`;
-    fileName += ".pdf";
-
-    doc.save(fileName);
-  }
-</script>
-
-</body>
-</html>
+    // --- ERDERPRÜFUNG ---
+    doc.setFont(undefined, 'bold');
+    doc.setTextColor(37, 99, 235);
+    doc.text
