@@ -17,7 +17,6 @@
     --text-color: #1e293b;
     --border-color: #cbd5e1;
     --danger: #ef4444;
-    --btn-dark: #2c3e50;
   }
   body {
     font-family: system-ui, -apple-system, sans-serif, Arial;
@@ -56,6 +55,13 @@
   .form-group {
     margin-bottom: 12px;
   }
+  .form-row {
+    display: flex;
+    gap: 10px;
+  }
+  .form-row .form-group {
+    flex: 1;
+  }
   label {
     display: block;
     font-weight: 600;
@@ -86,7 +92,6 @@
     width: 20px;
     height: 20px;
   }
-  /* Buttons für Anlagen-Fotos wie auf dem Bild */
   .custom-photo-btn {
     display: flex;
     align-items: center;
@@ -171,24 +176,38 @@
   
   <form id="erdungsForm">
     
-    <!-- 1. Stammdaten (Original) -->
+    <!-- Stammdaten exakt nach Vorgabe -->
     <fieldset>
-      <legend>Stammdaten</legend>
+      <legend>📋 Stammdaten</legend>
       <div class="form-group">
-        <label for="kunde">Kunde / Objekt:</label>
-        <input type="text" id="kunde" required placeholder="Name und Adresse">
-      </div>
-      <div class="form-group">
-        <label for="pruefer">Prüfer / Monteur:</label>
-        <input type="text" id="pruefer" required placeholder="Name des Prüfers">
-      </div>
-      <div class="form-group">
-        <label for="datum">Datum:</label>
+        <label for="datum">Datum</label>
         <input type="date" id="datum" required>
+      </div>
+      <div class="form-group">
+        <label for="auftragsnummer">Auftragsnummer</label>
+        <input type="text" id="auftragsnummer" placeholder="z.B. 2026-991">
+      </div>
+      <div class="form-group">
+        <label for="monteur">Monteur</label>
+        <input type="text" id="monteur" required placeholder="Name">
+      </div>
+      <div class="form-group">
+        <label for="strasse">Straße & Hausnummer</label>
+        <input type="text" id="strasse" required placeholder="Musterstraße 12">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="plz">PLZ</label>
+          <input type="text" id="plz" required placeholder="69115">
+        </div>
+        <div class="form-group">
+          <label for="stadt">Stadt</label>
+          <input type="text" id="stadt" required placeholder="Heidelberg">
+        </div>
       </div>
     </fieldset>
 
-    <!-- 2. Erderprüfung -->
+    <!-- Erderprüfung -->
     <fieldset>
       <legend>Erderprüfung</legend>
       <div class="form-group">
@@ -202,7 +221,7 @@
       <div id="previewErder" class="photo-preview"></div>
     </fieldset>
 
-    <!-- 3. Potenzialausgleich -->
+    <!-- Potenzialausgleich -->
     <fieldset>
       <legend>Potenzialausgleich</legend>
       <div class="form-group">
@@ -227,7 +246,7 @@
       <div id="previewPA" class="photo-preview"></div>
     </fieldset>
 
-    <!-- 4. Anlagen-Fotos (Pflicht) - Exakt wie auf Ihrem Screenshot -->
+    <!-- Anlagen-Fotos -->
     <fieldset>
       <legend>⚡ Anlagen-Fotos (Pflicht)</legend>
       
@@ -255,10 +274,8 @@
 </div>
 
 <script>
-  // Automatisches Datum
   document.getElementById('datum').valueAsDate = new Date();
 
-  // Foto-Speicher
   const photosData = {
     derder: [],
     dpa: [],
@@ -271,15 +288,17 @@
     return str.replace(/[^a-zA-Z0-9äöüÄÖÜß\-_]/g, '_').replace(/_+/g, '_').substring(0, 30);
   }
 
-  // Kamera-Aufnahme & Wasserzeichen-Einbettung
   function handlePhoto(event, previewId, storageKey, countId) {
     const files = event.target.files;
     if (!files || files.length === 0) return;
 
-    const kundeText = document.getElementById('kunde').value.trim() || 'Keine Adresse';
+    const strasseText = document.getElementById('strasse').value.trim();
+    const stadtText = document.getElementById('stadt').value.trim();
+    const adresseText = (strasseText && stadtText) ? `${strasseText}, ${stadtText}` : (strasseText || stadtText || 'Objekt');
+    
     const now = new Date();
     const timestampStr = `${now.toLocaleDateString('de-DE')} ${now.toLocaleTimeString('de-DE', {hour: '2-digit', minute:'2-digit'})}`;
-    const watermarkText = `${kundeText} | ${timestampStr}`;
+    const watermarkText = `${adresseText} | ${timestampStr}`;
 
     for (let file of files) {
       const reader = new FileReader();
@@ -291,10 +310,8 @@
           canvas.height = img.height;
           const ctx = canvas.getContext('2d');
 
-          // Bild zeichnen
           ctx.drawImage(img, 0, 0);
 
-          // Wasserzeichen einfügen
           const fontSize = Math.max(16, Math.floor(canvas.height / 35));
           ctx.font = `bold ${fontSize}px sans-serif`;
           const textWidth = ctx.measureText(watermarkText).width;
@@ -327,7 +344,6 @@
     const container = document.getElementById(previewId);
     container.innerHTML = '';
     
-    // Zähler auf dem Button aktualisieren
     if (countId) {
       document.getElementById(countId).innerText = photosData[storageKey].length;
     }
@@ -354,7 +370,9 @@
   }
 
   function downloadAllPhotos() {
-    const kundeClean = sanitizeFilename(document.getElementById('kunde').value.trim()) || 'Objekt';
+    const strasseClean = sanitizeFilename(document.getElementById('strasse').value.trim());
+    const stadtClean = sanitizeFilename(document.getElementById('stadt').value.trim());
+    const objektClean = (strasseClean && stadtClean) ? `${strasseClean}_${stadtClean}` : (strasseClean || stadtClean || 'Objekt');
     const datumVal = document.getElementById('datum').value || 'Datum';
 
     const categories = [
@@ -370,7 +388,7 @@
         count++;
         const a = document.createElement('a');
         a.href = photo.data;
-        a.download = `Foto_${cat.prefix}_${kundeClean}_${datumVal}_${index + 1}.jpg`;
+        a.download = `Foto_${cat.prefix}_${objektClean}_${datumVal}_${index + 1}.jpg`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -404,9 +422,12 @@
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
 
-    const kunde = document.getElementById('kunde').value.trim();
-    const pruefer = document.getElementById('pruefer').value.trim();
     const datum = document.getElementById('datum').value;
+    const auftrag = document.getElementById('auftragsnummer').value.trim();
+    const monteur = document.getElementById('monteur').value.trim();
+    const strasse = document.getElementById('strasse').value.trim();
+    const plz = document.getElementById('plz').value.trim();
+    const stadt = document.getElementById('stadt').value.trim();
     const ohmWert = document.getElementById('ohmWert').value;
     const paDetails = document.getElementById('paDetails').value;
 
@@ -422,13 +443,15 @@
     doc.setFontSize(11);
     doc.setTextColor(30, 41, 59);
     
-    // Stammdaten
+    // Stammdaten im PDF
     doc.setFont(undefined, 'bold');
     doc.text("Stammdaten", 15, y); y += 7;
     doc.setFont(undefined, 'normal');
-    doc.text(`Kunde / Objekt: ${kunde || '-'}` , 15, y); y += 6;
-    doc.text(`Prüfer / Monteur: ${pruefer || '-'}`, 15, y); y += 6;
-    doc.text(`Datum: ${datum || '-'}`, 15, y); y += 12;
+    doc.text(`Datum: ${datum || '-'}`, 15, y); y += 6;
+    doc.text(`Auftragsnummer: ${auftrag || '-'}`, 15, y); y += 6;
+    doc.text(`Monteur: ${monteur || '-'}`, 15, y); y += 6;
+    doc.text(`Straße & Hausnummer: ${strasse || '-'}`, 15, y); y += 6;
+    doc.text(`PLZ / Stadt: ${plz} ${stadt}`, 15, y); y += 12;
 
     // Erderprüfung
     doc.setFont(undefined, 'bold');
@@ -455,7 +478,6 @@
     }
     y += 10;
 
-    // Fotos im PDF verarbeiten
     function addPhotosToPdf(title, photos) {
       if (photos.length === 0) return;
       if (y > 230) { doc.addPage(); y = 20; }
@@ -480,9 +502,11 @@
     addPhotosToPdf("Fotos: Hausanschlusskasten (HAK)", photosData.dhak);
 
     // PDF Dateiname
-    const kundeClean = sanitizeFilename(kunde);
+    const strasseClean = sanitizeFilename(strasse);
+    const stadtClean = sanitizeFilename(stadt);
     let fileName = "Erdungsprotokoll";
-    if (kundeClean) fileName += `_${kundeClean}`;
+    if (strasseClean) fileName += `_${strasseClean}`;
+    if (stadtClean) fileName += `_${stadtClean}`;
     if (datum) fileName += `_${datum}`;
     fileName += ".pdf";
 
