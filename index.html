@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Protokoll über Erstellung der Erdungsanlage</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#2563eb">
+<link rel="icon" href="icon-192.png">
+<!-- jsPDF Einbindung via CDN für vollständige Funktionalität -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+  :root {
+    --primary: #2563eb;
+    --primary-dark: #1d4ed8;
+    --bg-color: #f8fafc;
+    --card-bg: #ffffff;
+    --text-color: #1e293b;
+    --border-color: #cbd5e1;
+    --danger: #ef4444;
+    --success: #22c55e;
+  }
+  body {
+    font-family: system-ui, -apple-system, sans-serif, Arial;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    margin: 0;
+    padding: 10px;
+    line-height: 1.5;
+  }
+  .container {
+    max-width: 600px;
+    margin: 0 auto;
+    background: var(--card-bg);
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  }
+  h1 {
+    font-size: 1.3rem;
+    text-align: center;
+    color: var(--primary);
+    margin-bottom: 20px;
+  }
+  fieldset {
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+    background: #fff;
+  }
+  legend {
+    font-weight: bold;
+    color: var(--primary);
+    padding: 0 5px;
+  }
+  .form-group {
+    margin-bottom: 12px;
+  }
+  label {
+    display: block;
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-bottom: 5px;
+  }
+  input[type="text"], input[type="date"], input[type="number"], select, textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    box-sizing: border-box;
+    font-size: 1rem;
+  }
+  .checkbox-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 8px;
+  }
+  .checkbox-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: normal;
+  }
+  .checkbox-item input {
+    width: 20px;
+    height: 20px;
+  }
+  .btn-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 20px;
+  }
+  button {
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  button:hover {
+    background-color: var(--primary-dark);
+    opacity: 0.9;
+  }
+  button.btn-secondary {
+    background-color: #64748b;
+  }
+  button.btn-danger {
+    background-color: var(--danger);
+  }
+  .photo-section {
+    margin-top: 10px;
+    border: 2px dashed var(--border-color);
+    padding: 10px;
+    border-radius: 6px;
+    text-align: center;
+  }
+  .photo-preview {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
+    justify-content: center;
+  }
+  .photo-thumb {
+    position: relative;
+    width: 85px;
+    height: 85px;
+    border-radius: 4px;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+  }
+  .photo-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .photo-thumb button.delete-photo {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    background: rgba(239, 68, 68, 0.85);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 22px;
+    height: 22px;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Protokoll über Erstellung der Erdungsanlage</h1>
+  
+  <form id="erdungsForm">
+    
+    <!-- 1. Stammdaten -->
+    <fieldset>
+      <legend>Stammdaten</legend>
+      <div class="form-group">
+        <label for="kunde">Kunde / Objekt (Adresse):</label>
+        <input type="text" id="kunde" required placeholder="z. B. Musterstraße 12, Musterstadt">
+      </div>
+      <div class="form-group">
+        <label for="pruefer">Prüfer / Monteur:</label>
+        <input type="text" id="pruefer" required placeholder="Name des Prüfers">
+      </div>
+      <div class="form-group">
+        <label for="datum">Datum:</label>
+        <input type="date" id="datum" required>
+      </div>
+    </fieldset>
+
+    <!-- 2. Erderprüfung -->
+    <fieldset>
+      <legend>Erderprüfung</legend>
+      <div class="form-group">
+        <label for="ohmWert">Gemessener Erdungswiderstand (&Omega;):</label>
+        <input type="number" step="0.01" id="ohmWert" placeholder="z. B. 0.5">
+      </div>
+      <div class="photo-section">
+        <label>Foto vom Erder & Messwerte</label>
+        <input type="file" accept="image/*" capture="environment" id="fileErder" onchange="handlePhoto(event, 'previewErder', 'derder')">
+        <div id="previewErder" class="photo-preview"></div>
+      </div>
+    </fieldset>
+
+    <!-- 3. Potenzialausgleich -->
+    <fieldset>
+      <legend>Potenzialausgleich</legend>
+      <div class="form-group">
+        <label>Was wurde geerdet?</label>
+        <div class="checkbox-list">
+          <label class="checkbox-item"><input type="checkbox" name="pa_ziel" value="Hauptpotentialausgleichsschiene"> Hauptpotentialausgleichsschiene (HPA)</label>
+          <label class="checkbox-item"><input type="checkbox" name="pa_ziel" value="Rohrleitungen (Gas/Wasser/Heizung)"> Rohrleitungen (Gas, Wasser, Heizung)</label>
+          <label class="checkbox-item"><input type="checkbox" name="pa_ziel" value="Antennenanlage / Sat"> Antennenanlage / Sat-Mast</label>
+          <label class="checkbox-item"><input type="checkbox" name="pa_ziel" value="Kabelwanne / Metallkonstruktion"> Metallkonstruktion / Kabelwanne</label>
+          <label class="checkbox-item"><input type="checkbox" name="pa_ziel" value="Blitzschutzanlage"> Blitzschutzanlage</label>
+        </div>
+      </div>
+      <div class="form-group" style="margin-top: 10px;">
+        <label for="paDetails">Zusätzliche Details:</label>
+        <textarea id="paDetails" rows="2" placeholder="Optionale Anmerkungen..."></textarea>
+      </div>
+      <div class="photo-section">
+        <label>Fotos Potenzialausgleich</label>
+        <input type="file" accept="image/*" capture="environment" id="filePA" onchange="handlePhoto(event, 'previewPA', 'dpa')">
+        <div id="previewPA" class="photo-preview"></div>
+      </div>
+    </fieldset>
+
+    <!-- 4. Anlagen Fotos -->
+    <fieldset>
+      <legend>Anlagen-Fotos</legend>
+      <div class="photo-section">
+        <label>Fotos der Gesamtanlage</label>
+        <input type="file" accept="image/*" capture="environment" id="fileAnlage" onchange="handlePhoto(event, 'previewAnlage', 'danlage')">
+        <div id="previewAnlage" class="photo-preview"></div>
+      </div>
+    </fieldset>
+
+    <!-- Buttons -->
+    <div class="btn-group">
+      <button type="button" onclick="generatePDF()">PDF erstellen & herunterladen</button>
+      <button type="button" class="btn-secondary" onclick="downloadAllPhotos()">Einzelne Fotos herunterladen</button>
+      <button type="button" class="btn-danger" onclick="clearForm()">Formular leeren</button>
+    </div>
+
+  </form>
+</div>
+
+<script>
+  // Automatisches Datum beim Laden setzen
+  document.getElementById('datum').valueAsDate = new Date();
+
+  // Speicher für Fotos
+  const photosData = {
+    derder: [],
+    dpa: [],
+    danlage: []
+  };
+
+  // Hilfsfunktion: Sauberen String für Dateinamen erzeugen
+  function sanitizeFilename(str) {
+    if (!str) return '';
+    return str.replace(/[^a-zA-Z0-9äöüÄÖÜß\-_]/g, '_').replace(/_+/g, '_').substring(0, 30);
+  }
+
+  // Foto-Verarbeitung inklusive Wasserzeichen-Stempel (Adresse + Datum/Uhrzeit)
+  function handlePhoto(event, previewId, storageKey) {
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
+
+    const kundeText = document.getElementById('kunde').value.trim() || 'Keine Adresse';
+    const now = new Date();
+    const timestampStr = `${now.toLocaleDateString('de-DE')} ${now.toLocaleTimeString('de-DE', {hour: '2-digit', minute:'2-digit'})}`;
+    const watermarkText = `${kundeText} | ${timestampStr}`;
+
+    for (let file of files) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+          // Canvas erstellen, um Wasserzeichen ins Bild einzubrennen
+          const canvas = document.createElement('canvas');
+          canvas.width = img.width;
+          canvas.height = img.height;
+          const ctx = canvas.getContext('2d');
+
+          // Original-Bild zeichnen
+          ctx.drawImage(img, 0, 0);
+
+          // Wasserzeichen-Hintergrund & Schrift stylen
+          const fontSize = Math.max(16, Math.floor(canvas.height / 35));
+          ctx.font = `bold ${fontSize}px sans-serif`;
+          
+          const textWidth = ctx.measureText(watermarkText).width;
+          const padding = 10;
+          const rectHeight = fontSize + (padding * 2);
+          
+          // Schwarzer transparenter Balken unten
+          ctx.fillStyle = 'rgba(0, 0, 0, 0.65)';
+          ctx.fillRect(0, canvas.height - rectHeight, textWidth + (padding * 2), rectHeight);
+
+          // Weißer Text
+          ctx.fillStyle = '#ffffff';
+          ctx.fillText(watermarkText, padding, canvas.height - padding - 2);
+
+          // In Base64 Umwandeln
+          const processedDataUrl = canvas.toDataURL('image/jpeg', 0.85);
+
+          photosData[storageKey].push({
+            name: file.name,
+            data: processedDataUrl
+          });
+
+          renderPreviews(storageKey, previewId);
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+    event.target.value = ''; // Input zurücksetzen
+  }
+
+  function renderPreviews(storageKey, previewId) {
+    const container = document.getElementById(previewId);
+    container.innerHTML = '';
+    photosData[storageKey].forEach((photo, index) => {
+      const thumb = document.createElement('div');
+      thumb.className = 'photo-thumb';
+      
+      const img = document.createElement('img');
+      img.src = photo.data;
+      thumb.appendChild(img);
+
+      const delBtn = document.createElement('button');
+      delBtn.className = 'delete-photo';
+      delBtn.innerHTML = '&times;';
+      delBtn.onclick = function() {
+        photosData[storageKey].splice(index, 1);
+        renderPreviews(storageKey, previewId);
+      };
+      thumb.appendChild(delBtn);
+
+      container.appendChild(thumb);
+    });
+  }
+
+  function downloadAllPhotos() {
+    const kundeClean = sanitizeFilename(document.getElementById('kunde').value.trim()) || 'Objekt';
+    const datumVal = document.getElementById('datum').value || 'Datum';
+
+    const categories = [
+      { key: 'derder', prefix: 'Erder' },
+      { key: 'dpa', prefix: 'Potenzialausgleich' },
+      { key: 'danlage', prefix: 'Anlage' }
+    ];
+
+    let count = 0;
+    categories.forEach(cat => {
+      photosData[cat.key].forEach((photo, index) => {
+        count++;
+        const a = document.createElement('a');
+        a.href = photo.data;
+        a.download = `Foto_${cat.prefix}_${kundeClean}_${datumVal}_${index + 1}.jpg`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      });
+    });
+
+    if (count === 0) {
+      alert('Keine Fotos vorhanden zum Herunterladen.');
+    }
+  }
+
+  function clearForm() {
+    if (confirm('Möchten Sie das Formular wirklich leeren?')) {
+      document.getElementById('erdungsForm').reset();
+      document.getElementById('datum').valueAsDate = new Date();
+      Object.keys(photosData).forEach(key => photosData[key] = []);
+      document.getElementById('previewErder').innerHTML = '';
+      document.getElementById('previewPA').innerHTML = '';
+      document.getElementById('previewAnlage').innerHTML = '';
+    }
+  }
+
+  function generatePDF() {
+    if (!window.jspdf) {
+      alert("jsPDF-Bibliothek lädt noch. Bitte kurz warten oder Seite neu laden.");
+      return;
+    }
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    const kunde = document.getElementById('kunde').value.trim();
+    const pruefer = document.getElementById('pruefer').value.trim();
+    const datum = document.getElementById('datum').value;
+    const ohmWert = document.getElementById('ohmWert').value;
+    const paDetails = document.getElementById('paDetails').value;
+
+    const selectedPA = Array.from(document.querySelectorAll('input[name="pa_ziel"]:checked'))
+                            .map(cb => cb.value);
+
+    let y = 20;
+    doc.setFontSize(16);
+    doc.setTextColor(37, 99, 235);
+    doc.text("Protokoll über Erstellung der Erdungsanlage", 105, y, { align: 'center' });
+    
+    y += 15;
+    doc.setFontSize(11);
+    doc.setTextColor(30, 41, 59);
+    
+    // Stammdaten
+    doc.setFont(undefined, 'bold');
+    doc.text("Stammdaten", 15, y); y += 7;
+    doc.setFont(undefined, 'normal');
+    doc.text(`Kunde / Objekt: ${kunde || '-'}` , 15, y); y += 6;
+    doc.text(`Prüfer / Monteur: ${pruefer || '-'}`, 15, y); y += 6;
+    doc.text(`Datum: ${datum || '-'}`, 15, y); y += 12;
+
+    // Erderprüfung
+    doc.setFont(undefined, 'bold');
+    doc.text("Erderprüfung", 15, y); y += 7;
+    doc.setFont(undefined, 'normal');
+    doc.text(`Gemessener Erdungswiderstand: ${ohmWert ? ohmWert + ' Ohm' : 'Keine Angabe'}`, 15, y); y += 12;
+
+    // Potenzialausgleich
+    doc.setFont(undefined, 'bold');
+    doc.text("Potenzialausgleich (Was wurde geerdet?)", 15, y); y += 7;
+    doc.setFont(undefined, 'normal');
+    if (selectedPA.length > 0) {
+      selectedPA.forEach(item => {
+        doc.text(`- ${item}`, 20, y);
+        y += 6;
+      });
+    } else {
+      doc.text("- Keine Auswahl getroffen", 20, y);
+      y += 6;
+    }
+    if (paDetails) {
+      doc.text(`Details: ${paDetails}`, 20, y);
+      y += 6;
+    }
+    y += 10;
+
+    // Fotos einbetten
+    function addPhotosToPdf(title, photos) {
+      if (photos.length === 0) return;
+      if (y > 230) { doc.addPage(); y = 20; }
+      doc.setFont(undefined, 'bold');
+      doc.text(title, 15, y); y += 8;
+      doc.setFont(undefined, 'normal');
+
+      photos.forEach(photo => {
+        if (y > 210) { doc.addPage(); y = 20; }
+        try {
+          // Bild mit festem Seitenverhältnis skalieren/einbetten
+          doc.addImage(photo.data, 'JPEG', 15, y, 65, 48);
+          y += 53;
+        } catch (e) {
+          console.error("Fehler beim Einbetten des Fotos:", e);
+        }
+      });
+    }
+
+    addPhotosToPdf("Fotos: Erder & Messwerte", photosData.derder);
+    addPhotosToPdf("Fotos: Potenzialausgleich", photosData.dpa);
+    addPhotosToPdf("Fotos: Gesamtanlage", photosData.danlage);
+
+    // Dynamischer Dateiname mit Adresse + Datum
+    const kundeClean = sanitizeFilename(kunde);
+    let fileName = "Erdungsprotokoll";
+    if (kundeClean) fileName += `_${kundeClean}`;
+    if (datum) fileName += `_${datum}`;
+    fileName += ".pdf";
+
+    doc.save(fileName);
+  }
+</script>
+
+</body>
+</html>
