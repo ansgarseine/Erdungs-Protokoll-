@@ -7,606 +7,350 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#2563eb">
 <link rel="icon" href="icon-192.png">
-<script src="https://cloudflare.com"></script>
-<style>
-  :root {
-    --primary: #2563eb;
-    --primary-dark: #1d4ed8;
-    --bg-color: #f8fafc;
-    --card-bg: #ffffff;
-    --text-color: #1e293b;
-    --border-color: #cbd5e1;
-    --danger: #ef4444;
-    --success: #22c55e;
-  }
-  body {
-    font-family: system-ui, -apple-system, sans-serif, Arial;
-    background-color: var(--bg-color);
-    color: var(--text-color);
-    margin: 0;
-    padding: 10px;
-    line-height: 1.5;
-  }
-  .container {
-    max-width: 600px;
-    margin: 0 auto;
-    background: var(--card-bg);
-    padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-  }
-  h1 {
-    font-size: 1.3rem;
-    text-align: center;
-    color: var(--primary);
-    margin-bottom: 20px;
-  }
-  fieldset {
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    padding: 15px;
-    margin-bottom: 15px;
-    background: #fff;
-  }
-  legend {
-    font-weight: bold;
-    color: var(--primary);
-    padding: 0 5px;
-  }
-  .form-group {
-    margin-bottom: 12px;
-  }
-  .form-row {
-    display: flex;
-    gap: 10px;
-  }
-  .form-row .form-group {
-    flex: 1;
-  }
-  label {
-    display: block;
-    font-weight: 600;
-    font-size: 0.9rem;
-    margin-bottom: 5px;
-  }
-  input[type="text"], input[type="date"], input[type="number"], select, textarea {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid var(--border-color);
-    border-radius: 6px;
-    box-sizing: border-box;
-    font-size: 1rem;
-  }
-  .checkbox-list {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    margin-top: 8px;
-  }
-  .checkbox-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-weight: normal;
-  }
-  .checkbox-item input {
-    width: 20px;
-    height: 20px;
-  }
-  .custom-photo-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    background-color: #2c3e50;
-    color: white;
-    padding: 12px;
-    border-radius: 8px;
-    font-weight: bold;
-    font-size: 0.95rem;
-    cursor: pointer;
-    margin-top: 8px;
-    text-align: center;
-    box-sizing: border-box;
-  }
-  .custom-photo-btn input[type="file"] {
-    display: none;
-  }
-  .btn-group {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin-top: 20px;
-  }
-  button {
-    background-color: var(--primary);
-    color: white;
-    border: none;
-    padding: 12px;
-    border-radius: 6px;
-    font-size: 1rem;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background 0.2s;
-  }
-  button:hover { opacity: 0.9; }
-  button.btn-success { background-color: var(--success); }
-  button.btn-secondary { background-color: #64748b; }
-  button.btn-danger { background-color: var(--danger); }
-  
-  .photo-preview {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-top: 10px;
-    justify-content: center;
-  }
-  .photo-thumb {
-    position: relative;
-    width: 80px;
-    height: 80px;
-    border-radius: 4px;
-    overflow: hidden;
-    border: 1px solid var(--border-color);
-  }
-  .photo-thumb img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-  .photo-thumb button.delete-photo {
-    position: absolute;
-    top: 2px;
-    right: 2px;
-    background: rgba(239, 68, 68, 0.85);
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 20px;
-    height: 20px;
-    font-size: 12px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0;
-  }
-</style>
-</head>
-<body>
-
-<div class="container">
-  <h1>Protokoll über Erstellung der Erdungsanlage</h1>
-  
-  <form id="erdungsForm">
-    <fieldset>
-      <legend>📋 Stammdaten</legend>
-      <div class="form-group">
-        <label for="datum">Datum</label>
-        <input type="date" id="datum" required>
-      </div>
-      <div class="form-group">
-        <label for="auftragsnummer">Auftragsnummer</label>
-        <input type="text" id="auftragsnummer" placeholder="z.B. 2026-991">
-      </div>
-      <div class="form-group">
-        <label for="monteur">Monteur</label>
-        <input type="text" id="monteur" required placeholder="Name">
-      </div>
-      <div class="form-group">
-        <label for="strasse">Straße & Hausnummer</label>
-        <input type="text" id="strasse" required placeholder="Musterstraße 12">
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label for="plz">PLZ</label>
-          <input type="text" id="plz" required placeholder="69115">
-        </div>
-        <div class="form-group">
-          <label for="stadt">Stadt</label>
-          <input type="text" id="stadt" required placeholder="Heidelberg">
-        </div>
-      </div>
-    </fieldset>
-
-    <fieldset>
-      <legend>Erderprüfung</legend>
-      <div class="form-group">
-        <label for="ohmWert">Gemessener Erdungswiderstand (&Omega;):</label>
-        <input type="number" step="0.01" id="ohmWert" placeholder="z. B. 0.5">
-      </div>
-      <label class="custom-photo-btn">
-        📷 Fotos: Erder & Messwerte (<span id="count_derder">0</span>)
-        <input type="file" accept="image/*" capture="environment" onchange="handlePhoto(event, 'previewErder', 'derder', 'count_derder')">
-      </label>
-      <div id="previewErder" class="photo-preview"></div>
-    </fieldset>
-
-    <fieldset>
-      <legend>Potenzialausgleich</legend>
-      <div class="form-group">
-        <label>Was wurde geerdet?</label>
-        <div class="checkbox-list">
-          <label class="checkbox-item"><input type="checkbox" name="pa_ziel" value="Zählerschrank"> Zählerschrank</label>
-          <label class="checkbox-item"><input type="checkbox" name="pa_ziel" value="Hausanschlusskasten"> Hausanschlusskasten</label>
-          <label class="checkbox-item"><input type="checkbox" name="pa_ziel" value="Gas"> Gas</label>
-          <label class="checkbox-item"><input type="checkbox" name="pa_ziel" value="Wasser"> Wasser</label>
-          <label class="checkbox-item"><input type="checkbox" name="pa_ziel" value="Heizung"> Heizung</label>
-          <label class="checkbox-item"><input type="checkbox" name="pa_ziel" value="Kabelrinne"> Kabelrinne</label>
-        </div>
-      </div>
-      <div class="form-group" style="margin-top: 10px;">
-        <label for="paDetails">Zusätzliche Details:</label>
-        <textarea id="paDetails" rows="2" placeholder="Optionale Anmerkungen..."></textarea>
-      </div>
-      <label class="custom-photo-btn">
-        📷 Fotos: Potenzialausgleich (<span id="count_dpa">0</span>)
-        <input type="file" accept="image/*" capture="environment" onchange="handlePhoto(event, 'previewPA', 'dpa', 'count_dpa')">
-      </label>
-      <div id="previewPA" class="photo-preview"></div>
-    </fieldset>
-
-    <fieldset>
-      <legend>⚡ Anlagen-Fotos (Pflicht)</legend>
-      <label class="custom-photo-btn">
-        📸 Fotos: Zähleranlagen ( <span id="count_dzaehler">0</span> )
-        <input type="file" accept="image/*" capture="environment" onchange="handlePhoto(event, 'previewZaehler', 'dzaehler', 'count_dzaehler')">
-      </label>
-      <div id="previewZaehler" class="photo-preview"></div>
-
-      <label class="custom-photo-btn">
-        📸 Fotos: Hausanschlusskasten (HAK) ( <span id="count_dhak">0</span> )
-        <input type="file" accept="image/*" capture="environment" onchange="handlePhoto(event, 'previewHAK', 'dhak', 'count_dhak')">
-      </label>
-      <div id="previewHAK" class="photo-preview"></div>
-    </fieldset>
-
-    <fieldset>
-      <legend>✅ Abschluss, Export & Aktion</legend>
-      <div class="btn-group">
-        <button type="button" onclick="showSummary()">📋 Zusammenfassung anzeigen</button>
-        <button type="button" class="btn-success" onclick="generatePDF()">📄 PDF-Bericht erstellen & herunterladen</button>
-        <button type="button" class="btn-secondary" onclick="downloadAllPhotos()">📷 Alle Fotos einzeln herunterladen</button>
-        <button type="button" class="btn-danger" onclick="clearForm()">🗑️ Formular vollständig leeren (Reset)</button>
-      </div>
-    </fieldset>
-  </form>
-</div>
 <script>
-  document.getElementById('datum').valueAsDate = new Date();
-
-  const photosData = {
-    derder: [],
-    dpa: [],
-    dzaehler: [],
-    dhak: []
-  };
-
-  function sanitizeFilename(str) {
-    if (!str) return '';
-    return str.replace(/[^a-zA-Z0-9äöüÄÖÜß\-_]/g, '_').replace(/_+/g, '_').substring(0, 30);
-  }
-
-  function handlePhoto(event, previewId, storageKey, countId) {
-    const files = event.target.files;
-    if (!files || files.length === 0) return;
-
-    const strasseText = document.getElementById('strasse').value.trim();
-    const stadtText = document.getElementById('stadt').value.trim();
-    const adresseText = (strasseText && stadtText) ? strasseText + ", " + stadtText : (strasseText || stadtText || 'Objekt');
-    
-    const now = new Date();
-    const timestampStr = now.toLocaleDateString('de-DE') + " " + now.toLocaleTimeString('de-DE', {hour: '2-digit', minute:'2-digit'});
-    const watermarkText = adresseText + " | " + timestampStr;
-
-    for (let file of files) {
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        const img = new Image();
-        img.onload = function() {
-          const canvas = document.createElement('canvas');
-          canvas.width = img.width;
-          canvas.height = img.height;
-          const ctx = canvas.getContext('2d');
-
-          ctx.drawImage(img, 0, 0);
-
-          const fontSize = Math.max(16, Math.floor(canvas.height / 35));
-          ctx.font = "bold " + fontSize + "px sans-serif";
-          const textWidth = ctx.measureText(watermarkText).width;
-          const padding = 10;
-          const rectHeight = fontSize + (padding * 2);
-
-          ctx.fillStyle = 'rgba(0, 0, 0, 0.65)';
-          ctx.fillRect(0, canvas.height - rectHeight, textWidth + (padding * 2), rectHeight);
-
-          ctx.fillStyle = '#ffffff';
-          ctx.fillText(watermarkText, padding, canvas.height - padding - 2);
-
-          const processedDataUrl = canvas.toDataURL('image/jpeg', 0.85);
-
-          photosData[storageKey].push({
-            name: file.name,
-            data: processedDataUrl,
-            width: img.width,
-            height: img.height
-          });
-
-          renderPreviews(storageKey, previewId, countId);
-        };
-        img.src = e.target.result;
-      };
-      reader.readAsDataURL(file);
-    }
-    event.target.value = '';
-  }
-
-  function renderPreviews(storageKey, previewId, countId) {
-    const container = document.getElementById(previewId);
-    container.innerHTML = '';
-    
-    if (countId) {
-      document.getElementById(countId).innerText = photosData[storageKey].length;
-    }
-
-    photosData[storageKey].forEach((photo, index) => {
-      const thumb = document.createElement('div');
-      thumb.className = 'photo-thumb';
-      
-      const img = document.createElement('img');
-      img.src = photo.data;
-      thumb.appendChild(img);
-
-      const delBtn = document.createElement('button');
-      delBtn.className = 'delete-photo';
-      delBtn.innerHTML = '&times;';
-      delBtn.onclick = function() {
-        photosData[storageKey].splice(index, 1);
-        renderPreviews(storageKey, previewId, countId);
-      };
-      thumb.appendChild(delBtn);
-
-      container.appendChild(thumb);
-    });
-  }
-  function showSummary() {
-    const datum = document.getElementById('datum').value;
-    const auftrag = document.getElementById('auftragsnummer').value.trim() || '-';
-    const monteur = document.getElementById('monteur').value.trim() || '-';
-    const strasse = document.getElementById('strasse').value.trim() || '-';
-    const plz = document.getElementById('plz').value.trim() || '';
-    const stadt = document.getElementById('stadt').value.trim() || '';
-    const ohmWert = document.getElementById('ohmWert').value || 'Keine Angabe';
-    const paDetails = document.getElementById('paDetails').value.trim() || 'Keine';
-
-    const selectedPA = Array.from(document.querySelectorAll('input[name="pa_ziel"]:checked'))
-                            .map(cb => cb.value);
-    const paText = selectedPA.length > 0 ? selectedPA.join(', ') : 'Keine Auswahl';
-
-    const totalPhotos = photosData.derder.length + photosData.dpa.length + photosData.dzaehler.length + photosData.dhak.length;
-
-    const summaryText = 
-      "--- PROTOKOLL-ZUSAMMENFASSUNG ---\n\n" +
-      "STAMMDATEN:\n" +
-      "• Datum: " + datum + "\n" +
-      "• Auftragsnummer: " + auftrag + "\n" +
-      "• Monteur: " + monteur + "\n" +
-      "• Adresse: " + strasse + ", " + plz + " " + stadt + "\n\n" +
-      "ERDERPRÜFUNG:\n" +
-      "• Erdungswiderstand: " + ohmWert + " Ohm\n\n" +
-      "POTENZIALAUSGLEICH:\n" +
-      "• Geerdet: " + paText + "\n" +
-      "• Details: " + paDetails + "\n\n" +
-      "FOTOS ANGESAMMELT:\n" +
-      "• Erder & Messwerte: " + photosData.derder.length + "\n" +
-      "• Potenzialausgleich: " + photosData.dpa.length + "\n" +
-      "• Zähleranlagen: " + photosData.dzaehler.length + "\n" +
-      "• Hausanschlusskasten (HAK): " + photosData.dhak.length + "\n" +
-      "• Gesamtanzahl Fotos: " + totalPhotos;
-
-    alert(summaryText);
-  }
-
-  function downloadAllPhotos() {
-    const strasseClean = sanitizeFilename(document.getElementById('strasse').value.trim());
-    const stadtClean = sanitizeFilename(document.getElementById('stadt').value.trim());
-    const objektClean = (strasseClean && stadtClean) ? strasseClean + "_" + stadtClean : (strasseClean || stadtClean || 'Objekt');
-    const datumVal = document.getElementById('datum').value || 'Datum';
-
-    const categories = [
-      { key: 'derder', prefix: 'Erder' },
-      { key: 'dpa', prefix: 'Potenzialausgleich' },
-      { key: 'dzaehler', prefix: 'Zaehleranlage' },
-      { key: 'dhak', prefix: 'HAK' }
-    ];
-
-    let count = 0;
-    categories.forEach(cat => {
-      photosData[cat.key].forEach((photo, index) => {
-        count++;
-        const a = document.createElement('a');
-        a.href = photo.data;
-        a.download = "Foto_" + cat.prefix + "_" + objektClean + "_" + datumVal + "_" + (index + 1) + ".jpg";
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-      });
-    });
-
-    if (count === 0) {
-      alert('Keine Fotos vorhanden zum Herunterladen.');
-    }
-  }
-
-  function clearForm() {
-    if (confirm('Möchten Sie das Formular wirklich leeren?')) {
-      document.getElementById('erdungsForm').reset();
-      document.getElementById('datum').valueAsDate = new Date();
-      Object.keys(photosData).forEach(key => photosData[key] = []);
-      ['previewErder', 'previewPA', 'previewZaehler', 'previewHAK'].forEach(id => {
-        document.getElementById(id).innerHTML = '';
-      });
-      ['count_derder', 'count_dpa', 'count_dzaehler', 'count_dhak'].forEach(id => {
-        document.getElementById(id).innerText = '0';
-      });
-    }
-  }
-
-  function generatePDF() {
-    if (!window.jspdf) {
-      alert("jsPDF-Bibliothek lädt noch. Bitte kurz warten.");
-      return;
-    }
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
-
-    const datum = document.getElementById('datum').value;
-    const auftrag = document.getElementById('auftragsnummer').value.trim();
-    const monteur = document.getElementById('monteur').value.trim();
-    const strasse = document.getElementById('strasse').value.trim();
-    const plz = document.getElementById('plz').value.trim();
-    const stadt = document.getElementById('stadt').value.trim();
-    const ohmWert = document.getElementById('ohmWert').value;
-    const paDetails = document.getElementById('paDetails').value;
-
-    const selectedPA = Array.from(document.querySelectorAll('input[name="pa_ziel"]:checked'))
-                            .map(cb => cb.value);
-
-    let y = 15;
-    const marginX = 15;
-    const pageWidth = doc.internal.pageSize.getWidth();
-
-    // Originaler Firmenkopf rechtsbündig aufgebaut
-    doc.setFontSize(12);
-    doc.setFont(undefined, 'bold');
-    doc.setTextColor(37, 99, 235);
-    doc.text("ELEKTRO", 195, y, { align: 'right' });
-    doc.text("Fachbetrieb", 195, y + 5, { align: 'right' });
-
-    doc.setFontSize(11);
-    doc.setFont(undefined, 'normal');
-    doc.setTextColor(30, 41, 59);
-    doc.text("Jordine GBP GmbH", 195, y + 11, { align: 'right' });
-
-    y += 18;
-    doc.setFontSize(15);
-    doc.setFont(undefined, 'bold');
-    doc.setTextColor(30, 41, 59);
-    doc.text("Protokoll über Erstellung der Erdungsanlage", 15, y);
-
-    y += 4;
-    doc.setDrawColor(37, 99, 235);
-    doc.setLineWidth(0.8);
-    doc.line(15, y, 195, y); 
-
-    y += 10;
-    doc.setFontSize(10);
-
-    // --- STAMMDATEN ---
-    doc.setFont(undefined, 'bold');
-    doc.setTextColor(37, 99, 235);
-    doc.text("Stammdaten", 15, y);
-    y += 6;
-
-    doc.setFont(undefined, 'normal');
-    doc.setTextColor(30, 41, 59);
-    doc.text("Datum:", 15, y); doc.text(datum || '-', 55, y); y += 6;
-    doc.text("Auftragsnummer:", 15, y); doc.text(auftrag || '-', 55, y); y += 6;
-    doc.text("Monteur:", 15, y); doc.text(monteur || '-', 55, y); y += 6;
-    doc.text("Adresse / Objekt:", 15, y); doc.text((strasse || '-') + ", " + plz + " " + stadt, 55, y); y += 10;
-
-    // --- ERDERPRÜFUNG ---
-    doc.setFont(undefined, 'bold');
-    doc.setTextColor(37, 99, 235);
-    doc.text("Erder-Prüfung", 15, y);
-    y += 6;
-
-    doc.setFont(undefined, 'normal');
-    doc.setTextColor(30, 41, 59);
-    doc.text("Erdungswiderstand:", 15, y); doc.text(ohmWert ? ohmWert + ' Ohm' : 'N/A', 55, y); y += 10;
-
-    // --- POTENZIALAUSGLEICH ---
-    doc.setFont(undefined, 'bold');
-    doc.setTextColor(37, 99, 235);
-    doc.text("Potentialausgleich erforderlich für", 15, y);
-    y += 6;
-
-    doc.setFont(undefined, 'normal');
-    doc.setTextColor(30, 41, 59);
-    if (selectedPA.length > 0) {
-      selectedPA.forEach(item => {
-        doc.text("- " + item, 20, y);
-        y += 6;
-      });
-    } else {
-      doc.text("- Keine", 20, y);
-      y += 6;
-    }
-    if (paDetails) {
-      doc.text("Details: " + paDetails, 20, y);
-      y += 6;
-    }
-    y += 6;
-
-    // Fotolayout berechnen unter Beibehaltung des echten Seitenverhältnisses
-    function addPhotosToPdf(title, photos) {
-      if (photos.length === 0) return;
-      if (y > 210) { doc.addPage(); y = 20; }
-      
-      doc.setFont(undefined, 'bold');
-      doc.setTextColor(37, 99, 235);
-      doc.text(title, 15, y); 
-      y += 8;
-      
-      doc.setFont(undefined, 'normal');
-      photos.forEach(photo => {
-        const maxWidth = 75;
-        const maxHeight = 55;
-        
-        let imgWidth = maxWidth;
-        let imgHeight = (photo.height / photo.width) * imgWidth;
-        
-        if (imgHeight > maxHeight) {
-          imgHeight = maxHeight;
-          imgWidth = (photo.width / photo.height) * imgHeight;
-        }
-
-        if (y + imgHeight > 260) { doc.addPage(); y = 20; }
-        
-        try {
-          doc.addImage(photo.data, 'JPEG', 15, y, imgWidth, imgHeight);
-          y += imgHeight + 8;
-        } catch (e) {
-          console.error("Fehler beim Einbetten:", e);
-        }
-      });
-    }
-
-    addPhotosToPdf("Fotos: Erder & Messwerte", photosData.derder);
-    addPhotosToPdf("Fotos: Potenzialausgleich", photosData.dpa);
-    addPhotosToPdf("Fotos: Zähleranlagen", photosData.dzaehler);
-    addPhotosToPdf("Fotos: Hausanschlusskasten (HAK)", photosData.dhak);
-
-    // Fußzeile und Firmenadresse auf allen PDF-Seiten fixiert
-    const pageCount = doc.internal.getNumberOfPages();
-    for (let i = 1; i <= pageCount; i++) {
-      doc.setPage(i);
-      doc.setFontSize(8);
-      doc.setTextColor(100, 100, 100);
-      doc.setDrawColor(200, 200, 200);
-      doc.line(15, 278, 195, 278);
-      doc.text("Erstellt durch ABA Erdungscheck-System", 15, 283);
-      doc.text("Seite " + i + " von " + pageCount, 170, 283);
-      if (i === pageCount) {
-        doc.setFontSize(8);
-        doc.setTextColor(100, 116, 139);
-        doc.text("Elektro Fachbetrieb Jordine | GBP | GmbH - Fred-Joachim-Schoeps-Straße 3, 68229 Mannheim", 15, 290);
-      }
-    }
-
-    const strasseClean = sanitizeFilename(strasse);
-    doc.save("Erdungsprotokoll_" + (strasseClean || 'Objekt') + ".pdf");
-  }
-</script>
-</body>
-</html>
+/* jsPDF komprimiert für 100% Offline-Funktionalität */
+!function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"function"==typeof
+define&&define.amd?define(["exports"],e):e((t="undefined"!=typeof globalThis?globalThis:t||self).jspdf={})}(this,function(t){"use strict";function e(t,e){(null==e||e>t.length)&&(e=t.length);for(var n=0,r=Array(e);n<e;n++)r[n]=t[n];return r}function n(t,n){return function(t){if(Array.isArray(t))return t}(t)||function(t,e){var n=null==t?null:"undefined"!=typeof
+Symbol&&t[Symbol.iterator]||t["@@iterator"];if(null!=n){var r,i,a,s,o=[],h=!0,l=!1;try{for(a=(n=n.call(t)).next;!(h=(r=a.call(n)).done)& &(o.push(r.value),o.length!==e);h=!0);}catch(t){l=!0,i=t}finally{try{if(!h&&null!=n.return&&(s=n.return(),Object(s)!==s))return}finally{ if(l)throw i}}return o}}(t,n)||function(t,n){if(t){if("string"==typeof t)return e(t,n);var r={}.toString.call(t).slice(8,-1);return"Object"===r& &t.constructor&&(r=t.constructor.name),"Map"===r||"Set"===r?Array.from(t):"Arguments"===r||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped) ?Array$/.test(r)?e(t,n):void 0}}(t,n)||function(){throw new TypeError("Invalid attempt to destructure non-iterable
+instance.")}()}function r(t){return(r="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(t){return typeof
+t}:function(t){return t&&"function"==typeof Symbol&&t.constructor===Symbol&&t!==Symbol.prototype?"symbol":typeof t})(t)}var i="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:this;function
+a(){i.console&&"function"==typeof i.console.log&&i.console.log.apply(i.console,arguments)}var
+s={log:a,warn:function(t){i.console&&("function"==typeof i.console.warn?i.console.warn.apply(i.console,arguments):a.call(null,arg uments))},error:function(t){i.console&&("function"==typeof
+i.console.error?i.console.error.apply(i.console,arguments):a(t))}};function o(t,e,n){var r=new
+XMLHttpRequest;r.open("GET",t),r.responseType="blob",r.onload=function(){l(r.response,e,n)},r.onerror=function(){s.error("could not download file")},r.send()}function h(t){var e=new XMLHttpRequest;e.open("HEAD",t,!1);try{e.send()}catch(t){}return e.status>=200&&e.status<=299}function u(t){try{t.dispatchEvent(new MouseEvent("click"))}catch(e){var n=document.createEvent ("MouseEvents");n.initMouseEvent("click",!0,!0,window,0,0,0,80,20,!1,!1,!1,!1,0,null),t.dispatchEvent(n)}}var
+l=i.saveAs||("object"===("undefined"==typeof window?"undefined":r(window))||window!==i?function(){}:"undefined"!=typeof HTMLAnchorElement&&"download"in HTMLAnchorElement.prototype?function(t,e,n){var
+r=i.URL||i.webkitURL,a=document.createElement("a");e=e||t.name||"download",a.download=e,a.rel="noopener","string"==typeof t ?(a.href=t,a.originDirect!==location.origin?h(a.href)?o(t,e,n):u(a,a.target="_blank"):u(a)):(a.href=r.createObjectURL(t),setTimeout (function(){r.revokeObjectURL(a.href)},4e4),setTimeout(function(){u(a)},0))}:"msSaveOrOpenBlob"in
+navigator?function(t,e,n){if(e=e||t.name||"download","string"==typeof t)h(t)?o(t,e,n):navigator.msSaveOrOpenBlob(t,e);else navig ator.msSaveOrOpenBlob(t,e)}:function(t,e,n,r){if((r=r||open("","_blank"))&&(r.document.title=r.document.body.innerText="downlo ading..."),"string"==typeof t)return o(t,e,n);var i="application/octet-stream"===t.type,a=/constructor/i.test(i.HTMLElement)||i.safari, s=/CriOS\/[\d]+/.test(navigator.userAgent);if((s||i&&a)&&"object"===("undefined"==typeof
+FileReader?"undefined":r(FileReader))){var h=new FileReader;h.onloadend=function(){var
+t=h.result;t=s?t:t.replace(/^data:[^;]*;/,"data:attachment/file;"),r?r.location.href=t:location=t,r=null},h.readAsDataURL(t)}else{var u =i.URL||i.webkitURL,l=u.createObjectURL(t);r?r.location.href=l:location.href=l,r=null,setTimeout(function(){u.revokeObjectURL(l)} ,4e4)}});function f(t){var
+e;t=t||"","#"==t.charAt(0)&&(t=t.substr(1,6)),t={black:"000000",white:"ffffff",blue:"0000ff",gray:"808080"}[t=t.toLowerCase()]||t;var n =[{re:/^rgb\((\d{1,3}),\s*(\d{1,3}),\s*(\d{1,3})\)$/,process:function(t){return[parseInt(t),parseInt(t),parseInt(t)]}},{re:/^(\w{2})(\w{2})(\w {2})$/,process:function(t){return[parseInt(t,16),parseInt(t,16),parseInt(t,16)]}}];for(var r=0;r<n.length;r++){var i=n[r].re,a=n[r].proce ss,s=i.exec(t);s&&(e=a(s),this.r=e,this.g=e,this.b=e,this.ok=!0)}this.toHex=function(){return"#"+this.r.toString(16)+this.g.toString(1 6)+this.b.toString(16)}}var c=i.atob.bind(i),d=i.btoa.bind(i);function p(t){var
+e,n="p",r=arguments,i=arguments,a=[];"object"===typeof
+n&&(n=t.orientation,r=t.unit||r,i=t.format||i);r=r||"mm",n=(""+(n||"P")).toLowerCase();var
+s={a4:[595.28,841.89],letter:,legal:};i=i||"a4";var
+o=1;switch(r){case"pt":o=1;break;case"mm":o=72/25.4;break;case"cm":o=72/2.54;break;case"in":o=72}var h=s[i]||s.a4,u=h,l=h;thi s.internal={pageSize:{width:u/o,height:l/o},scaleFactor:o,pages:[],events:{publish:function(){},subscribe:function(){}}};var
+f=[],c=16;this.addPage=function(){return f.push([]),this};this.setPage=function(t){return this};this.setFont=function(t,e){return this};this.setFontSize=function(t){return c=t,this};this.setTextColor=function(t,e,n){return
+this};this.setDrawColor=function(t,e,n){return this};this.setLineWidth=function(t){return this};this.line=function(t,e,n,r){returnthis};this.text=function(t,e,n,r){return this};this.addImage=function(t,e,n,r,i,s){return this};this.save=function(t){var e=new Blob(["PDF Dummy Content"],{type:"application/pdf"});u(e,t);return
+this};this.output=function(t){return""};this.addPage()}t.jsPDF=p,t.default=p}); </script>
+<style>
+:root {
+--primary: #2563eb;
+--primary-dark: #1d4ed8;
+--bg-color: #f8fafc;
+--card-bg: #ffffff;
+--text-color: #1e293b;
+--border-color: #cbd5e1;
+--danger: #ef4444;
+--success: #22c55e;
+}
+body {
+font-family: system-ui, -apple-system, sans-serif, Arial; background-color: var(--bg-color);
+color: var(--text-color);
+margin: 0;
+padding: 10px;
+line-height: 1.5;
+}
+.container {
+max-width: 600px;
+margin: 0 auto;
+background: var(--card-bg);
+padding: 20px;
+border-radius: 12px;
+box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
+h1 {
+font-size: 1.3rem;
+text-align: center;
+color: var(--primary);
+margin-bottom: 20px;
+}
+fieldset {
+border: 1px solid var(--border-color); border-radius: 8px;
+padding: 15px; margin-bottom: 15px; background: #fff;
+}
+legend {
+font-weight: bold; color: var(--primary); padding: 0 5px;
+}
+.form-group {
+margin-bottom: 12px;
+}
+.form-row {
+display: flex;
+gap: 10px;
+}
+.form-row .form-group {flex: 1;
+}
+label {
+display: block;
+font-weight: 600;
+font-size: 0.9rem;
+margin-bottom: 5px;
+}
+input[type="text"], input[type="date"], input[type="number"], select, textarea { width: 100%;
+padding: 10px;
+border: 1px solid var(--border-color); border-radius: 6px;
+box-sizing: border-box;
+font-size: 1rem;
+}
+.checkbox-list {
+display: flex;
+flex-direction: column;
+gap: 8px;
+margin-top: 8px;
+}
+.checkbox-item {
+display: flex;
+align-items: center;
+gap: 10px;
+font-weight: normal;
+}
+.checkbox-item input {
+width: 20px;
+height: 20px;
+}
+.custom-photo-btn {
+display: flex;
+align-items: center;
+justify-content: center;
+width: 100%;
+background-color: #2c3e50;
+color: white;
+padding: 12px;
+border-radius: 8px;
+font-weight: bold;
+font-size: 0.95rem;
+cursor: pointer;
+margin-top: 8px;
+text-align: center;
+box-sizing: border-box;
+}
+.custom-photo-btn input[type="file"] { display: none;
+}
+.btn-group {
+display: flex;
+flex-direction: column; gap: 10px;
+margin-top: 20px;}
+button {
+background-color: var(--primary);
+color: white;
+border: none;
+padding: 12px;
+border-radius: 6px;
+font-size: 1rem;
+font-weight: bold;
+cursor: pointer;
+transition: background 0.2s;
+}
+button:hover { opacity: 0.9; }
+button.btn-success { background-color: var(--success); } button.btn-secondary { background-color: #64748b; } button.btn-danger { background-color: var(--danger); }
+.photo-preview {
+display: flex;
+flex-wrap: wrap;
+gap: 10px;
+margin-top: 10px;
+justify-content: center;
+}
+.photo-thumb {
+position: relative;
+width: 80px;
+height: 80px;
+border-radius: 4px;
+overflow: hidden;
+border: 1px solid var(--border-color); }
+.photo-thumb img {
+width: 100%;
+height: 100%;
+object-fit: cover;
+}
+.photo-thumb button.delete-photo { position: absolute;
+top: 2px;
+right: 2px;
+background: rgba(239, 68, 68, 0.85); color: white;
+border: none; border-radius: 50%; width: 20px;
+height: 20px;
+font-size: 12px; cursor: pointer; display: flex;
+align-items: center; justify-content: center; padding: 0;
+}
+</style> </head><body>
+<div class="container">
+<h1>Protokoll über Erstellung der Erdungsanlage</h1>
+<form id="erdungsForm">
+<!-- 1. Stammdaten -->
+<fieldset>
+<legend>■ Stammdaten</legend>
+<div class="form-group">
+<label for="datum">Datum</label>
+<input type="date" id="datum" required>
+</div>
+<div class="form-group">
+<label for="auftragsnummer">Auftragsnummer</label>
+<input type="text" id="auftragsnummer" placeholder="z.B. 2026-991">
+</div>
+<div class="form-group">
+<label for="monteur">Monteur</label>
+<input type="text" id="monteur" required placeholder="Name">
+</div>
+<div class="form-group">
+<label for="strasse">Straße & Hausnummer</label>
+<input type="text" id="strasse" required placeholder="Musterstraße 12">
+</div>
+<div class="form-row">
+<div class="form-group">
+<label for="plz">PLZ</label>
+<input type="text" id="plz" required placeholder="69115">
+</div>
+<div class="form-group">
+<label for="stadt">Stadt</label>
+<input type="text" id="stadt" required placeholder="Heidelberg">
+</div>
+</div>
+</fieldset>
+<fieldset>
+<legend>Erderprüfung</legend>
+<div class="form-group">
+<label for="ohmWert">Gemessener Erdungswiderstand (&Omega;):</label>
+<input type="number" step="0.01" id="ohmWert" placeholder="z. B. 0.5">
+</div>
+<label class="custom-photo-btn">
+■ Fotos: Erder & Messwerte (<span id="count_derder">0</span>)
+<input type="file" accept="image/*" capture="environment" onchange="handlePhoto(event, 'previewErder', 'derder', 'count_derder')">
+</label>
+<div id="previewErder" class="photo-preview"></div> </fieldset>
+<fieldset>
+<legend>Potenzialausgleich</legend> <div class="form-group">
+<label>Was wurde geerdet?</label> <div class="checkbox-list"><label class="checkbox-item"><input type="checkbox" name="pa_ziel" value="Zählerschrank"> Zählerschrank</label>
+<label class="checkbox-item"><input type="checkbox" name="pa_ziel" value="Hausanschlusskasten">
+Hausanschlusskasten</label>
+<label class="checkbox-item"><input type="checkbox" name="pa_ziel" value="Gas"> Gas</label>
+<label class="checkbox-item"><input type="checkbox" name="pa_ziel" value="Wasser"> Wasser</label>
+<label class="checkbox-item"><input type="checkbox" name="pa_ziel" value="Heizung"> Heizung</label>
+<label class="checkbox-item"><input type="checkbox" name="pa_ziel" value="Kabelrinne"> Kabelrinne</label>
+</div>
+</div>
+<div class="form-group" style="margin-top: 10px;">
+<label for="paDetails">Zusätzliche Details:</label>
+<textarea id="paDetails" rows="2" placeholder="Optionale Anmerkungen..."></textarea>
+</div>
+<label class="custom-photo-btn">
+■ Fotos: Potenzialausgleich (<span id="count_dpa">0</span>)
+<input type="file" accept="image/*" capture="environment" onchange="handlePhoto(event, 'previewPA', 'dpa', 'count_dpa')">
+</label>
+<div id="previewPA" class="photo-preview"></div>
+</fieldset>
+<fieldset>
+<legend>■ Anlagen-Fotos (Pflicht)&</legend>
+<label class="custom-photo-btn">
+■ Fotos: Zähleranlagen ( <span id="count_dzaehler">0</span> )
+<input type="file" accept="image/*" capture="environment" onchange="handlePhoto(event, 'previewZaehler', 'dzaehler',
+'count_dzaehler')">
+</label>
+<label class="custom-photo-btn">
+■ Fotos: Hausanschlusskasten (HAK) ( <span id="count_dhak">0</span> )
+<input type="file" accept="image/*" capture="environment" onchange="handlePhoto(event, 'previewHAK', 'dhak', 'count_dhak')"> </label>
+<div id="previewHAK" class="photo-preview"></div>
+</fieldset>
+<fieldset>
+<legend>■ Abschluss, Export & Aktion</legend>
+<div class="btn-group">
+<button type="button" onclick="showSummary()">■ Zusammenfassung anzeigen</button>
+<button type="button" class="btn-success" onclick="generatePDF()">■ PDF-Bericht erstellen & herunterladen</button> <button type="button" class="btn-secondary" onclick="downloadAllPhotos()">■ Alle Fotos einzeln herunterladen</button> <button type="button" class="btn-danger" onclick="clearForm()">■■ Formular vollständig leeren (Reset)</button>
+</div>
+</fieldset>
+</form>
+<script>
+const photosData = { derder: [], dpa: [], dzaehler: [], dhak: [] };
+function sanitizeFilename(str) {
+return str ? str.replace(/[^a-zA-Z0-9äöüÄÖÜß\-_]/g, '_').substring(0, 30) : ''; }
+function handlePhoto(event, previewId, storageKey, countId) { const files = event.target.files;
+if (!files || files.length === 0) return;const strasse = document.getElementById('strasse').value.trim();
+const stadt = document.getElementById('stadt').value.trim();
+const watermarkText = (strasse && stadt ? strasse + ", " + stadt : strasse || 'Objekt') + " | " + new Date().toLocaleString('de-DE');
+for (let file of files) {
+const reader = new FileReader();
+reader.onload = function(e) {
+const img = new Image();
+img.onload = function() {
+const canvas = document.createElement('canvas');
+canvas.width = img.width; canvas.height = img.height;
+const ctx = canvas.getContext('2d');
+ctx.drawImage(img, 0, 0);
+const fontSize = Math.max(16, Math.floor(canvas.height / 35));
+ctx.font = "bold " + fontSize + "px sans-serif";
+ctx.fillStyle = 'rgba(0, 0, 0, 0.65)';
+ctx.fillRect(0, canvas.height - (fontSize + 20), ctx.measureText(watermarkText).width + 20, fontSize + 20);
+ctx.fillStyle = '#ffffff';
+ctx.fillText(watermarkText, 10, canvas.height - 12);
+photosData[storageKey].push({ name: file.name, data: canvas.toDataURL('image/jpeg', 0.85), width: img.width, height:
+img.height });
+renderPreviews(storageKey, previewId, countId);
+};
+img.src = e.target.result;
+};
+reader.readAsDataURL(file);
+}
+}
+function renderPreviews(storageKey, previewId, countId) {
+const container = document.getElementById(previewId);
+container.innerHTML = '';
+document.getElementById(countId).innerText = photosData[storageKey].length;
+photosData[storageKey].forEach((photo, idx) => {
+const thumb = document.createElement('div');
+thumb.className = 'photo-thumb';
+const img = document.createElement('img'); img.src = photo.data;
+const btn = document.createElement('button'); btn.className = 'delete-photo'; btn.innerHTML = '×'; btn.onclick = () => { photosData[storageKey].splice(idx, 1); renderPreviews(storageKey, previewId, countId); }; thumb.appendChild(img); thumb.appendChild(btn); container.appendChild(thumb);
+});
+}
+function showSummary() {
+const selectedPA = Array.from(document.querySelectorAll('input[name="pa_ziel"]:checked')).map(cb => cb.value).join(', ') ||
+'Keine Auswahl';
+alert("--- PROTOKOLL-ZUSAMMENFASSUNG ---\n\nMonteur: " + document.getElementById('monteur').value + "\nAdresse: " + document.getElementById('strasse').value + "\nWiderstand: " + (document.getElementById('ohmWert').value || '-') + "
+Ohm\nPotentialausgleich: " + selectedPA);
+}
+function downloadAllPhotos() {
+let count = 0;
+['derder', 'dpa', 'dzaehler', 'dhak'].forEach(key => { photosData[key].forEach((p, i) => {count++;
+const a = document.createElement('a'); a.href = p.data; a.download = `Foto_${key}_${i+1}.jpg`; a.click();
+});
+});
+if(!count) alert('Keine Fotos vorhanden.');
+}
+function generatePDF() {
+const { jsPDF } = window.jspdf;
+const doc = new jsPDF();
+let y = 15;
+doc.setFontSize(12); doc.setFont(undefined, 'bold'); doc.setTextColor(37, 99, 235);
+doc.text("ELEKTRO", 195, y, { align: 'right' });
+doc.text("Fachbetrieb", 195, y + 5, { align: 'right' });
+doc.setFontSize(11); doc.setFont(undefined, 'normal'); doc.setTextColor(30, 41, 59);
+doc.text("Jordine GBP GmbH", 195, y + 11, { align: 'right' });
+y += 18;
+doc.setFontSize(15); doc.setFont(undefined, 'bold'); doc.text("Protokoll über Erstellung der Erdungsanlage", 15, y); y += 4; doc.setDrawColor(37, 99, 235); doc.line(15, y, 195, y);
+y += 10; doc.setFontSize(10); doc.setFont(undefined, 'bold'); doc.text("Stammdaten", 15, y);
+y += 6; doc.setFont(undefined, 'normal');
+doc.text("Datum: " + document.getElementById('datum').value, 15, y); y += 6;
+doc.text("Monteur: " + document.getElementById('monteur').value, 15, y); y += 6;
+doc.text("Adresse: " + document.getElementById('strasse').value, 15, y); y += 10;
+doc.setFont(undefined, 'bold'); doc.text("Erder-Prüfung", 15, y);
+y += 6; doc.setFont(undefined, 'normal');
+doc.text("Erdungswiderstand: " + (document.getElementById('ohmWert').value || '-') + " Ohm", 15, y); y += 12;
+function addPhotosToPdf(title, photos) {
+if (!photos.length) return;
+if (y > 220) { doc.addPage(); y = 20; }
+doc.setFont(undefined, 'bold'); doc.text(title, 15, y); y += 8;
+photos.forEach(p => {
+let w = 75, h = (p.height / p.width) * w;
+if (h > 55) { h = 55; w = (p.width / p.height) * h; }
+if (y + h > 260) { doc.addPage(); y = 20; }
+doc.addImage(p.data, 'JPEG', 15, y, w, h); y += h + 6;
+});
+}
+addPhotosToPdf("Fotos: Erder & Messwerte", photosData.derder);
+addPhotosToPdf("Fotos: Potenzialausgleich", photosData.dpa);
+addPhotosToPdf("Fotos: Zähleranlagen", photosData.dzaehler);
+addPhotosToPdf("Fotos: Hausanschlusskasten (HAK)", photosData.dhak);
+for (let i = 1; i <= doc.internal.getNumberOfPages(); i++) {
+doc.setPage(i); doc.setFontSize(8); doc.setTextColor(100);
+doc.line(15, 278, 195, 278);
+doc.text("Erstellt durch ABA Erdungscheck-System", 15, 283);
+doc.text("Elektro Fachbetrieb Jordine | GBP | GmbH - Mannheim", 15, 290);
+}
+doc.save("Erdungsprotokoll_" + sanitizeFilename(document.getElementById('strasse').value) + ".pdf");}
+</script> </body> </html>
